@@ -40,7 +40,7 @@ void solve(
     VectorType& solution,
     scalar t,
     scalar dt,
-    [[maybe_unused]] const Dictionary& fvSchemes,
+    const Dictionary& fvSchemes,
     const Dictionary& fvSolution
 )
 {
@@ -49,12 +49,12 @@ void solve(
     {
         NF_ERROR_EXIT("No temporal or implicit terms to solve.");
     }
-    exp.build(fvSchemes);
+    exp.read(fvSchemes);
     if (exp.temporalOperators().size() > 0)
     {
         // integrate equations in time
         timeIntegration::TimeIntegration<VectorType> timeIntegrator(
-            fvSchemes.subDict("ddtSchemes"), fvSchemes
+            fvSchemes.subDict("ddtSchemes"), fvSolution
         );
         timeIntegrator.solve(exp, solution, t, dt);
     }
@@ -72,13 +72,13 @@ void solve(
         exp.implicitOperation(ls);
         auto expTmp = exp.explicitOperation(solution.mesh().nCells());
 
-        auto [vol, expSource, rhs] = spans(solution.mesh().cellVolumes(), expTmp, ls.rhs());
+        auto [vol, expSource, rhs] = views(solution.mesh().cellVolumes(), expTmp, ls.rhs());
 
         // subtract the explicit source term from the rhs
         parallelFor(
             solution.exec(),
             {0, rhs.size()},
-            KOKKOS_LAMBDA(const size_t i) { rhs[i] -= expSource[i] * vol[i]; }
+            KOKKOS_LAMBDA(const localIdx i) { rhs[i] -= expSource[i] * vol[i]; }
         );
 
         auto solver = NeoN::la::Solver(solution.exec(), fvSolution);

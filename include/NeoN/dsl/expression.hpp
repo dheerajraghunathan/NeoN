@@ -30,20 +30,21 @@ public:
           spatialOperators_(exp.spatialOperators_)
     {}
 
-    void build(const Dictionary& input)
+    /* @brief dispatch read call to operator */
+    void read(const Dictionary& input)
     {
         for (auto& op : temporalOperators_)
         {
-            op.build(input);
+            op.read(input);
         }
         for (auto& op : spatialOperators_)
         {
-            op.build(input);
+            op.read(input);
         }
     }
 
     /* @brief perform all explicit operation and accumulate the result */
-    Vector<ValueType> explicitOperation(size_t nCells) const
+    Vector<ValueType> explicitOperation(localIdx nCells) const
     {
         Vector<ValueType> source(exec_, nCells, zero<ValueType>());
         return explicitOperation(source);
@@ -120,7 +121,10 @@ public:
 
 
     /* @brief getter for the total number of terms in the equation */
-    size_t size() const { return temporalOperators_.size() + spatialOperators_.size(); }
+    localIdx size() const
+    {
+        return static_cast<localIdx>(temporalOperators_.size() + spatialOperators_.size());
+    }
 
     // getters
     const std::vector<TemporalOperator<ValueType>>& temporalOperators() const

@@ -94,8 +94,8 @@ TEST_CASE("MatrixAssembly - Ginkgo")
 
         Vector<scalar> values(exec, {1.0, -0.1, -0.1, 1.0, -0.1, -0.1, 1.0});
         Vector<localIdx> colIdx(exec, {0, 1, 0, 1, 2, 1, 2});
-        Vector<localIdx> rowPtrs(exec, {0, 2, 5, 7});
-        CSRMatrix<scalar, localIdx> csrMatrix(values, colIdx, rowPtrs);
+        Vector<localIdx> rowOffs(exec, {0, 2, 5, 7});
+        CSRMatrix<scalar, localIdx> csrMatrix(values, colIdx, rowOffs);
 
         Vector<scalar> rhs(exec, {1.0, 2.0, 3.0});
         LinearSystem<scalar, localIdx> linearSystem(csrMatrix, rhs);
@@ -111,13 +111,16 @@ TEST_CASE("MatrixAssembly - Ginkgo")
         auto solver = NeoN::la::Solver(exec, solverDict);
 
         // Solve system
-        solver.solve(linearSystem, x);
+        auto [numIter, initResNorm, finalResNorm] = solver.solve(linearSystem, x);
 
         auto hostX = x.copyToHost();
         auto hostXS = hostX.view();
         REQUIRE((hostXS[0]) == Catch::Approx(1.24489796).margin(1e-8));
         REQUIRE((hostXS[1]) == Catch::Approx(2.44897959).margin(1e-8));
         REQUIRE((hostXS[2]) == Catch::Approx(3.24489796).margin(1e-8));
+        REQUIRE(numIter == 3);
+        REQUIRE(initResNorm == Catch::Approx(3.741657386).margin(1e-8));
+        REQUIRE(finalResNorm < 1.0e-04);
     }
 }
 #endif

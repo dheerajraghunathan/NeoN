@@ -42,10 +42,7 @@ public:
     static std::string schema() { return "none"; }
 
     void solve(
-        dsl::Expression<ValueType>& eqn,
-        SolutionVectorType& solutionVector,
-        [[maybe_unused]] scalar t,
-        scalar dt
+        dsl::Expression<ValueType>& eqn, SolutionVectorType& solutionVector, scalar t, scalar dt
     ) override
     {
         auto source = eqn.explicitOperation(solutionVector.size());
@@ -54,7 +51,7 @@ public:
         // solutionVector.internalVector() = oldSolutionVector.internalVector() - source * dt;
         // solutionVector.correctBoundaryConditions();
         // solve sparse matrix system
-        using ValueType = typename SolutionVectorType::ElementType;
+        // using ValueType = typename SolutionVectorType::ElementType;
 
         // TODO decouple from fvcc specific implementation
         auto sparsity = NeoN::finiteVolume::cellCentred::SparsityPattern(solutionVector.mesh());

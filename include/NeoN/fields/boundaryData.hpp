@@ -127,15 +127,49 @@ public:
      * @brief Get the number of boundaries.
      * @return The number of boundaries.
      */
-    size_t nBoundaries() const { return nBoundaries_; }
+    localIdx nBoundaries() const { return nBoundaries_; }
 
     /**
      * @brief Get the number of boundary faces.
      * @return The number of boundary faces.
      */
-    size_t nBoundaryFaces() const { return nBoundaryFaces_; }
+    localIdx nBoundaryFaces() const { return nBoundaryFaces_; }
 
     const Executor& exec() { return exec_; }
+
+    BoundaryData<T>& operator=(const BoundaryData<T>& rhs)
+    {
+
+        // TODO maybe dont overwrite nBoundaries and nBoundaryFaces
+        // but use them for a sanity check
+        nBoundaries_ = rhs.nBoundaries_;
+        nBoundaryFaces_ = rhs.nBoundaryFaces_;
+
+        value_ = rhs.value_;
+        refValue_ = rhs.refValue_;
+        valueFraction_ = rhs.valueFraction_;
+        refGrad_ = rhs.refGrad_;
+        boundaryTypes_ = rhs.boundaryTypes_;
+        offset_ = rhs.offset_;
+        return *this;
+    }
+
+    BoundaryData<T>& operator=(const BoundaryData<T>&& rhs)
+    {
+
+        // TODO maybe dont overwrite nBoundaries and nBoundaryFaces
+        // but use them for a sanity check
+        nBoundaries_ = rhs.nBoundaries_;
+        nBoundaryFaces_ = rhs.nBoundaryFaces_;
+
+        value_ = std::move(rhs.value_);
+        refValue_ = std::move(rhs.refValue_);
+        valueFraction_ = std::move(rhs.valueFraction_);
+        refGrad_ = std::move(rhs.refGrad_);
+        boundaryTypes_ = std::move(rhs.boundaryTypes_);
+        offset_ = std::move(rhs.offset_);
+        return *this;
+    }
 
     /**
      * @brief Get the range for a given patchId
