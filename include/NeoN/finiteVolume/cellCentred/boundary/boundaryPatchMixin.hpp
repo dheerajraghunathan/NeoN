@@ -4,6 +4,7 @@
 
 #include "NeoN/fields/fieldTypeDefs.hpp"
 #include "NeoN/fields/field.hpp"
+#include "NeoN/core/dictionary.hpp"
 
 #include "NeoN/mesh/unstructured/unstructuredMesh.hpp"
 
@@ -48,7 +49,9 @@ public:
 
     localIdx patchID() const { return patchID_; }
 
-    std::pair<localIdx, localIdx> range() { return {start_, end_}; }
+    std::pair<localIdx, localIdx> range() const { return {start_, end_}; }
+
+
 
 protected:
 
