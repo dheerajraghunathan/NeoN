@@ -104,7 +104,7 @@ jobs:
          cmake --preset ${{matrix.preset}} \
            -DNeoN_BUILD_TESTS=ON \
            -DNeoN_DEVEL_TOOLS=OFF \
-           -DNeoN_WITH_GINKGO=OFF \
+           -DNeoN_WITH_GINKGO=ON \
            -DNeoN_ENABLE_MPI_WITH_THREAD_SUPPORT=OFF
          cmake --build  --preset ${{matrix.preset}}
 
